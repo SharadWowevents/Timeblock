@@ -1,0 +1,2012 @@
+<title>Timeblock</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style id="app-styles">
+:root{
+  --bg:#f5f4ef;
+  --surface:#ffffff;
+  --surface-2:#faf9f4;
+  --border:#e3ded2;
+  --border-strong:#d3cbb9;
+  --ink:#22221d;
+  --ink-muted:#75705f;
+  --accent:#2f6f68;
+  --accent-ink:#ffffff;
+  --accent-soft:#e3efec;
+  --danger:#b3432f;
+  --danger-soft:#f6e6e1;
+  --shadow:0 16px 40px -16px rgba(34,34,29,0.28);
+
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1b1b18;
+    --surface:#242420;
+    --surface-2:#2a2a25;
+    --border:#3a382f;
+    --border-strong:#4a473b;
+    --ink:#f1efe6;
+    --ink-muted:#a6a08c;
+    --accent:#63b0a5;
+    --accent-ink:#0f1e1c;
+    --accent-soft:#233a37;
+    --danger:#e18468;
+    --danger-soft:#3a2620;
+    --shadow:0 16px 40px -16px rgba(0,0,0,0.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1b1b18;
+  --surface:#242420;
+  --surface-2:#2a2a25;
+  --border:#3a382f;
+  --border-strong:#4a473b;
+  --ink:#f1efe6;
+  --ink-muted:#a6a08c;
+  --accent:#63b0a5;
+  --accent-ink:#0f1e1c;
+  --accent-soft:#233a37;
+  --danger:#e18468;
+  --danger-soft:#3a2620;
+  --shadow:0 16px 40px -16px rgba(0,0,0,0.6);
+}
+
+*{box-sizing:border-box;}
+[hidden]{display:none !important;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  min-height:100vh;
+}
+img{max-width:100%;}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important; transition:none !important;}
+}
+
+.app-shell{
+  max-width:1400px;
+  margin:0 auto;
+  padding:28px 28px 60px;
+}
+@media (max-width: 640px){
+  .app-shell{ padding:18px 14px 40px; }
+}
+
+.app-header{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px 24px;
+  margin-bottom:22px;
+}
+.app-title{
+  font-family:"Fraunces", Georgia, serif;
+  font-weight:600;
+  font-size:32px;
+  letter-spacing:-0.01em;
+  text-wrap:balance;
+  margin:0;
+  color:var(--ink);
+}
+.app-subtitle{
+  margin:4px 0 0;
+  color:var(--ink-muted);
+  font-size:14px;
+  max-width:52ch;
+}
+@media (max-width: 640px){
+  .app-title{ font-size:24px; }
+  .app-subtitle{ font-size:13px; }
+}
+.legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 16px;
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+.legend-item{
+  display:inline-flex;
+  align-items:center;
+  font-size:12px;
+  color:var(--ink-muted);
+  letter-spacing:0.01em;
+}
+.dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:var(--cat-c, var(--ink-muted));
+  display:inline-block;
+  margin-right:6px;
+  flex:none;
+}
+
+.banner{
+  background:var(--danger-soft);
+  color:var(--danger);
+  border:1px solid var(--danger);
+  border-radius:10px;
+  padding:10px 14px;
+  font-size:13px;
+  margin-bottom:16px;
+}
+
+.layout{
+  display:flex;
+  align-items:flex-start;
+  gap:24px;
+}
+@media (max-width: 900px){
+  .layout{flex-direction:column; align-items:stretch;}
+}
+
+.grid-panel{
+  flex:1 1 auto;
+  min-width:0;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.table-scroll{
+  overflow-x:auto;
+  overflow-y:visible;
+  -webkit-overflow-scrolling:touch;
+}
+.week-table{
+  border-collapse:separate;
+  border-spacing:0;
+  width:100%;
+  min-width:1550px;
+}
+.week-table thead th{
+  position:sticky;
+  top:0;
+  background:var(--surface-2);
+  color:var(--ink-muted);
+  font-family:"IBM Plex Mono", "SFMono-Regular", Menlo, monospace;
+  font-weight:500;
+  font-size:11px;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  padding:10px 6px;
+  border-bottom:1px solid var(--border);
+  white-space:nowrap;
+  z-index:2;
+}
+.week-table thead th.corner{
+  position:sticky;
+  left:0;
+  top:0;
+  z-index:4;
+  background:var(--surface-2);
+  text-align:left;
+  padding-left:16px;
+  min-width:118px;
+}
+.day-cell{
+  position:sticky;
+  left:0;
+  z-index:1;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:10px 12px;
+  text-align:left;
+  font-weight:600;
+  font-size:13.5px;
+  white-space:nowrap;
+  min-width:118px;
+}
+.day-row.is-today .day-cell{
+  background:var(--accent-soft);
+  color:var(--ink);
+}
+.today-badge{
+  display:inline-block;
+  margin-left:8px;
+  padding:1px 7px;
+  border-radius:99px;
+  background:var(--accent);
+  color:var(--accent-ink);
+  font-size:9.5px;
+  font-weight:700;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  vertical-align:middle;
+}
+.slot{
+  border-bottom:1px solid var(--border);
+  border-right:1px solid var(--border);
+  padding:3px;
+  min-width:68px;
+  height:44px;
+  vertical-align:middle;
+}
+.day-row.is-today .slot{
+  background:color-mix(in srgb, var(--accent-soft) 45%, transparent);
+}
+.time-head.is-now-col{
+  background:var(--accent);
+  color:var(--accent-ink);
+}
+.slot.is-now{
+  position:relative;
+  box-shadow:inset 0 0 0 2px var(--accent);
+  border-radius:6px;
+}
+.slot.is-now::after{
+  content:"";
+  position:absolute;
+  top:3px;
+  right:3px;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--accent);
+  animation:now-pulse 2s ease-in-out infinite;
+}
+@keyframes now-pulse{
+  0%, 100%{ opacity:1; }
+  50%{ opacity:0.3; }
+}
+@media (prefers-reduced-motion: reduce){
+  .slot.is-now::after{ animation:none; }
+}
+.slot-add{
+  width:100%;
+  height:100%;
+  border:1px dashed transparent;
+  border-radius:8px;
+  background:transparent;
+  color:var(--border-strong);
+  font-size:15px;
+  line-height:1;
+  cursor:pointer;
+  opacity:0;
+  transition:opacity 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+.slot:hover .slot-add{
+  opacity:1;
+  border-color:var(--border-strong);
+  background:var(--surface-2);
+}
+.slot-add:focus-visible{
+  opacity:1;
+  outline:2px solid var(--accent);
+  outline-offset:1px;
+}
+@media (hover: none){
+  .slot-add{ opacity:0.4; }
+}
+.chip{
+  width:100%;
+  height:100%;
+  border:none;
+  border-left:3px solid var(--cat-c, var(--border-strong));
+  border-radius:6px;
+  background:color-mix(in srgb, var(--cat-c, var(--border-strong)) 18%, var(--surface));
+  color:var(--ink);
+  font-family:inherit;
+  font-size:11.5px;
+  font-weight:600;
+  text-align:left;
+  padding:0 8px;
+  cursor:pointer;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.chip:hover{
+  background:color-mix(in srgb, var(--cat-c, var(--border-strong)) 28%, var(--surface));
+}
+.chip:focus-visible, .slot-add:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:1px;
+}
+
+.todo-panel{
+  flex:0 0 300px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  padding:20px;
+  position:sticky;
+  top:16px;
+}
+@media (max-width: 900px){
+  .todo-panel{flex:1 1 auto; width:100%; position:static;}
+}
+.todo-header{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+.todo-header h2{
+  font-family:"Fraunces", Georgia, serif;
+  font-weight:600;
+  font-size:19px;
+  margin:0;
+}
+.todo-count{
+  font-family:"IBM Plex Mono", monospace;
+  font-size:12px;
+  color:var(--ink-muted);
+}
+#todo-form{
+  display:flex;
+  gap:8px;
+  margin-bottom:14px;
+}
+#todo-input{
+  flex:1 1 auto;
+  min-width:0;
+}
+.todo-list{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  max-height:60vh;
+  overflow-y:auto;
+}
+.todo-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:8px 2px;
+  border-bottom:1px solid var(--border);
+}
+.todo-item:last-child{border-bottom:none;}
+.todo-check{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  min-width:0;
+  flex:1 1 auto;
+}
+.todo-check input{
+  width:16px;
+  height:16px;
+  accent-color:var(--accent);
+  flex:none;
+}
+.todo-text{
+  font-size:13.5px;
+  overflow-wrap:anywhere;
+}
+.todo-item.done .todo-text{
+  color:var(--ink-muted);
+  text-decoration:line-through;
+}
+.todo-delete{
+  border:none;
+  background:transparent;
+  color:var(--ink-muted);
+  font-size:18px;
+  line-height:1;
+  cursor:pointer;
+  padding:2px 4px;
+  border-radius:6px;
+  flex:none;
+}
+.todo-delete:hover{color:var(--danger); background:var(--danger-soft);}
+.empty-note{
+  color:var(--ink-muted);
+  font-size:13px;
+  margin:8px 0 0;
+}
+
+input[type="text"], input[type="email"], input[type="password"], select{
+  font-family:inherit;
+  font-size:13.5px;
+  color:var(--ink);
+  background:var(--surface-2);
+  border:1px solid var(--border-strong);
+  border-radius:9px;
+  padding:9px 11px;
+  width:100%;
+}
+input[type="text"]:focus-visible, input[type="email"]:focus-visible, input[type="password"]:focus-visible, select:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:1px;
+}
+.select-field{
+  position:relative;
+}
+.select-btn{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  width:100%;
+  font-family:inherit;
+  font-size:13.5px;
+  color:var(--ink);
+  background:var(--surface-2);
+  border:1px solid var(--border-strong);
+  border-radius:9px;
+  padding:9px 11px;
+  cursor:pointer;
+  text-align:left;
+}
+.select-btn:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:1px;
+}
+.select-btn-label{
+  flex:1 1 auto;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.select-chevron{
+  color:var(--ink-muted);
+  font-size:11px;
+  flex:none;
+}
+.select-panel{
+  position:absolute;
+  left:0;
+  right:0;
+  top:calc(100% + 6px);
+  background:var(--surface);
+  border:1px solid var(--border-strong);
+  border-radius:12px;
+  box-shadow:var(--shadow);
+  max-height:220px;
+  overflow-y:auto;
+  z-index:6;
+  padding:6px;
+  margin:0;
+  list-style:none;
+}
+.select-option{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:13.5px;
+  color:var(--ink);
+}
+.select-option:hover{
+  background:var(--surface-2);
+}
+.select-option.selected{
+  font-weight:600;
+}
+.select-option .option-check{
+  margin-left:auto;
+  color:var(--accent);
+  font-size:12px;
+}
+.select-option.add-new{
+  border-top:1px solid var(--border);
+  margin-top:4px;
+  padding-top:10px;
+  color:var(--accent);
+  font-weight:600;
+}
+.swatch-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:8px;
+}
+.swatch-btn{
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  border:2px solid transparent;
+  background:var(--cat-c);
+  padding:0;
+  cursor:pointer;
+}
+.swatch-btn.selected{
+  border-color:var(--surface);
+  box-shadow:0 0 0 2px var(--cat-c);
+}
+@media (hover: none){
+  .swatch-btn{ width:32px; height:32px; }
+}
+
+.btn{
+  font-family:inherit;
+  font-size:13.5px;
+  font-weight:600;
+  border-radius:9px;
+  padding:9px 16px;
+  cursor:pointer;
+  border:1px solid transparent;
+}
+.btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+.btn-primary{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+.btn-primary:hover{filter:brightness(1.06);}
+.btn-secondary{background:transparent; color:var(--ink); border-color:var(--border-strong);}
+.btn-secondary:hover{background:var(--surface-2);}
+.btn-ghost-danger{background:transparent; color:var(--danger); border-color:transparent; margin-right:auto;}
+.btn-ghost-danger:hover{background:var(--danger-soft);}
+
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(20,19,15,0.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:10;
+}
+.modal{
+  background:var(--surface);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  padding:24px;
+  width:100%;
+  max-width:380px;
+  max-height:calc(100vh - 40px);
+  overflow-y:auto;
+}
+@media (max-width: 480px){
+  .modal-overlay{ padding:12px; }
+  .modal{ padding:18px; }
+}
+.modal h2{
+  font-family:"Fraunces", Georgia, serif;
+  font-weight:600;
+  font-size:20px;
+  margin:0 0 2px;
+}
+.modal-subtitle{
+  font-family:"IBM Plex Mono", monospace;
+  font-size:12px;
+  color:var(--ink-muted);
+  margin:0 0 18px;
+}
+.field-label{
+  font-size:12px;
+  font-weight:600;
+  color:var(--ink-muted);
+  text-transform:uppercase;
+  letter-spacing:0.04em;
+  margin:14px 0 6px;
+}
+.field-hint{
+  font-size:11.5px;
+  color:var(--ink-muted);
+  margin:5px 0 0;
+}
+.modal-actions{
+  display:flex;
+  align-items:center;
+  margin-top:22px;
+}
+.modal-actions-right{
+  display:flex;
+  gap:8px;
+  margin-left:auto;
+}
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:24px;
+  transform:translateX(-50%);
+  background:var(--ink);
+  color:var(--bg);
+  font-size:13px;
+  padding:10px 16px;
+  border-radius:99px;
+  box-shadow:var(--shadow);
+  z-index:20;
+}
+
+.bookmarks-section{
+  margin-top:28px;
+}
+.bookmarks-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+.bookmarks-header h2{
+  font-family:"Fraunces", Georgia, serif;
+  font-weight:600;
+  font-size:20px;
+  margin:0;
+  color:var(--ink);
+}
+.bookmarks-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));
+  gap:16px;
+}
+.bookmark-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+.bookmark-card-header{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:8px;
+}
+.bookmark-heading{
+  font-family:"Fraunces", Georgia, serif;
+  font-weight:600;
+  font-size:16px;
+  margin:0;
+  flex:1 1 auto;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  cursor:text;
+  padding:3px 5px;
+  border-radius:6px;
+  color:var(--ink);
+}
+.bookmark-heading:hover, .bookmark-heading:focus-visible{
+  background:var(--surface-2);
+  outline:none;
+}
+.bookmark-heading-input{
+  font-family:"Fraunces", Georgia, serif;
+  font-weight:600;
+  font-size:16px;
+  flex:1 1 auto;
+  min-width:0;
+  padding:3px 5px;
+  border-radius:6px;
+}
+.bookmark-tab-delete{
+  border:none;
+  background:transparent;
+  color:var(--ink-muted);
+  font-size:18px;
+  line-height:1;
+  cursor:pointer;
+  padding:2px 5px;
+  border-radius:6px;
+  flex:none;
+}
+.bookmark-tab-delete:hover{color:var(--danger); background:var(--danger-soft);}
+.bookmark-list{
+  list-style:none;
+  margin:0 0 10px;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.bookmark-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 2px;
+  border-bottom:1px solid var(--border);
+}
+.bookmark-row:last-child{border-bottom:none;}
+.bookmark-favicon{
+  width:16px;
+  height:16px;
+  flex:none;
+  border-radius:3px;
+}
+.bookmark-favicon-fallback{
+  width:16px;
+  height:16px;
+  flex:none;
+  border-radius:3px;
+  background:var(--border-strong);
+}
+.bookmark-title{
+  flex:1 1 auto;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:13.5px;
+  color:var(--ink);
+  text-decoration:none;
+}
+.bookmark-title:hover{text-decoration:underline;}
+.bookmark-delete{
+  border:none;
+  background:transparent;
+  color:var(--ink-muted);
+  font-size:16px;
+  line-height:1;
+  cursor:pointer;
+  padding:2px 4px;
+  border-radius:6px;
+  flex:none;
+  opacity:0;
+  transition:opacity 120ms ease;
+}
+.bookmark-row:hover .bookmark-delete, .bookmark-delete:focus-visible{
+  opacity:1;
+}
+@media (hover: none){
+  .bookmark-delete{ opacity:0.55; }
+}
+.bookmark-add-btn{
+  align-self:flex-start;
+  font-size:12.5px;
+  padding:7px 12px;
+}
+
+.auth-screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+.auth-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  padding:28px;
+  width:100%;
+  max-width:380px;
+}
+.auth-title{
+  font-family:"Fraunces", Georgia, serif;
+  font-weight:600;
+  font-size:26px;
+  margin:0 0 6px;
+  color:var(--ink);
+}
+.auth-subtitle{
+  font-size:13px;
+  color:var(--ink-muted);
+  margin:0 0 18px;
+}
+.auth-submit{
+  width:100%;
+  margin-top:18px;
+}
+.field-error{
+  font-size:12px;
+  color:var(--danger);
+  margin:8px 0 0;
+}
+
+.session-bar{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  gap:10px 14px;
+  margin-bottom:14px;
+}
+.session-info{
+  display:flex;
+  align-items:baseline;
+  flex-wrap:wrap;
+  gap:4px 12px;
+  min-width:0;
+}
+.live-clock{
+  font-family:"IBM Plex Mono", monospace;
+  font-size:12.5px;
+  color:var(--ink-muted);
+  white-space:nowrap;
+}
+.session-user{
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--ink);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.session-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.btn-sm{
+  font-size:12px;
+  padding:6px 12px;
+}
+
+.admin-modal{
+  max-width:440px;
+}
+.user-list{
+  list-style:none;
+  margin:14px 0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  max-height:220px;
+  overflow-y:auto;
+}
+.user-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 2px;
+  border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+.user-row:last-child{border-bottom:none;}
+.user-row-info{
+  flex:1 1 auto;
+  min-width:0;
+  overflow:hidden;
+}
+.user-row-email{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:var(--ink);
+}
+.user-row-meta{
+  font-size:11px;
+  color:var(--ink-muted);
+}
+.role-badge{
+  font-family:"IBM Plex Mono", monospace;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+  padding:1px 6px;
+  border-radius:99px;
+  background:var(--accent-soft);
+  color:var(--accent);
+  flex:none;
+}
+.user-row-delete{
+  border:none;
+  background:transparent;
+  color:var(--ink-muted);
+  font-size:16px;
+  line-height:1;
+  cursor:pointer;
+  padding:2px 4px;
+  border-radius:6px;
+  flex:none;
+}
+.user-row-delete:hover{color:var(--danger); background:var(--danger-soft);}
+.admin-divider{
+  border-top:1px solid var(--border);
+  margin:4px 0 14px;
+}
+.role-radio-group{
+  display:flex;
+  gap:16px;
+  margin-top:6px;
+}
+.role-radio{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:13px;
+  color:var(--ink);
+  cursor:pointer;
+  font-weight:400;
+  text-transform:none;
+  letter-spacing:normal;
+}
+</style>
+
+<template id="chrome-template">
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-card">
+    <h1 class="auth-title">Timeblock</h1>
+    <div id="setup-form-wrap">
+      <p class="auth-subtitle">Set up the admin account to get started. You'll use this to log in and to create logins for anyone else who needs one.</p>
+      <form id="setup-form">
+        <label class="field-label" for="setup-email">Admin email</label>
+        <input type="email" id="setup-email" autocomplete="username" placeholder="you@example.com" required>
+        <label class="field-label" for="setup-password">Password</label>
+        <input type="password" id="setup-password" autocomplete="new-password" placeholder="At least 6 characters" required>
+        <label class="field-label" for="setup-password-confirm">Confirm password</label>
+        <input type="password" id="setup-password-confirm" autocomplete="new-password" required>
+        <p class="field-error" id="setup-error" hidden></p>
+        <button type="submit" class="btn btn-primary auth-submit">Create admin account</button>
+      </form>
+    </div>
+    <div id="login-form-wrap" hidden>
+      <p class="auth-subtitle">Log in to see your week.</p>
+      <form id="login-form">
+        <label class="field-label" for="login-email">Email</label>
+        <input type="email" id="login-email" autocomplete="username" placeholder="you@example.com" required>
+        <label class="field-label" for="login-password">Password</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+        <p class="field-error" id="login-error" hidden></p>
+        <button type="submit" class="btn btn-primary auth-submit">Log in</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="app-root" hidden>
+<div class="app-shell">
+  <div class="session-bar" id="session-bar">
+    <div class="session-info">
+      <span class="live-clock" id="live-clock"></span>
+      <span class="session-user" id="session-user"></span>
+    </div>
+    <div class="session-actions">
+      <button type="button" class="btn btn-secondary btn-sm" id="manage-users-btn" hidden>Manage users</button>
+      <button type="button" class="btn btn-secondary btn-sm" id="logout-btn">Log out</button>
+    </div>
+  </div>
+  <header class="app-header">
+    <div>
+      <h1 class="app-title">Timeblock</h1>
+      <p class="app-subtitle">Your recurring week, Monday to Sunday. Click a time slot to add a repeating task &mdash; one-off items go on the to-do list.</p>
+    </div>
+    <ul class="legend" id="legend" hidden></ul>
+  </header>
+
+  <div class="banner" id="banner" hidden></div>
+
+  <main class="layout">
+    <section class="grid-panel">
+      <div class="table-scroll">
+        <table class="week-table">
+          <thead><tr id="time-header-row"></tr></thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <aside class="todo-panel">
+      <div class="todo-header">
+        <h2>To&#8209;do</h2>
+        <span class="todo-count" id="todo-count">0</span>
+      </div>
+      <form id="todo-form">
+        <input type="text" id="todo-input" placeholder="One-off task&hellip;" maxlength="120" autocomplete="off">
+        <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+      <ul class="todo-list" id="todo-list"></ul>
+      <p class="empty-note" id="todo-empty" hidden>Nothing here yet &mdash; add a one-off task above.</p>
+    </aside>
+  </main>
+
+  <section class="bookmarks-section">
+    <div class="bookmarks-header">
+      <h2>Bookmarks</h2>
+      <button type="button" class="btn btn-secondary" id="add-tab-btn">+ Add tab</button>
+    </div>
+    <div class="bookmarks-grid" id="bookmarks-grid"></div>
+  </section>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <h2 id="modal-title">Add task</h2>
+    <p class="modal-subtitle" id="modal-subtitle"></p>
+    <form id="task-form">
+      <label class="field-label" for="task-text">Task</label>
+      <input type="text" id="task-text" maxlength="60" autocomplete="off" placeholder="e.g. Gym, Team standup, Read">
+      <label class="field-label" id="category-field-label">Category</label>
+      <div class="select-field" id="category-select-wrap">
+        <button type="button" class="select-btn" id="category-select-btn" aria-haspopup="listbox" aria-expanded="false">
+          <span class="dot" id="category-select-dot" hidden></span>
+          <span class="select-btn-label" id="category-select-label">No category</span>
+          <span class="select-chevron" aria-hidden="true">&#9662;</span>
+        </button>
+        <ul class="select-panel" id="category-select-panel" role="listbox" hidden></ul>
+      </div>
+      <div id="new-category-name-field" hidden>
+        <input type="text" id="new-category-name" maxlength="24" autocomplete="off" placeholder="New category name" style="margin-top:8px;">
+      </div>
+      <div id="category-color-field" hidden>
+        <p class="field-hint" id="category-color-hint">Pick a color:</p>
+        <div class="swatch-row" id="category-swatches"></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost-danger" id="delete-task-btn" hidden>Delete</button>
+        <div class="modal-actions-right">
+          <button type="button" class="btn btn-secondary" id="cancel-task-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="bookmark-modal-overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="bookmark-modal-title">
+    <h2 id="bookmark-modal-title">Add bookmark</h2>
+    <p class="modal-subtitle" id="bookmark-modal-subtitle"></p>
+    <form id="bookmark-form">
+      <label class="field-label" for="bookmark-url">URL</label>
+      <input type="text" id="bookmark-url" autocomplete="off" placeholder="e.g. wowevents.in">
+      <label class="field-label" for="bookmark-title">Title</label>
+      <input type="text" id="bookmark-title" maxlength="60" autocomplete="off" placeholder="e.g. WOW Events site">
+      <div class="modal-actions">
+        <div class="modal-actions-right">
+          <button type="button" class="btn btn-secondary" id="cancel-bookmark-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="admin-modal-overlay" hidden>
+  <div class="modal admin-modal" role="dialog" aria-modal="true" aria-labelledby="admin-modal-title">
+    <h2 id="admin-modal-title">Manage users</h2>
+    <p class="modal-subtitle">Create a login for anyone who should have their own timetable.</p>
+    <ul class="user-list" id="admin-user-list"></ul>
+    <div class="admin-divider"></div>
+    <form id="add-user-form">
+      <label class="field-label" for="new-user-email">Email</label>
+      <input type="email" id="new-user-email" autocomplete="off" placeholder="name@example.com">
+      <label class="field-label" for="new-user-password">Password</label>
+      <input type="password" id="new-user-password" autocomplete="new-password" placeholder="At least 6 characters">
+      <label class="field-label">Role</label>
+      <div class="role-radio-group">
+        <label class="role-radio"><input type="radio" name="new-user-role" value="user" checked> User</label>
+        <label class="role-radio"><input type="radio" name="new-user-role" value="admin"> Admin</label>
+      </div>
+      <p class="field-error" id="add-user-error" hidden></p>
+      <div class="modal-actions">
+        <div class="modal-actions-right">
+          <button type="button" class="btn btn-secondary" id="close-admin-modal-btn">Close</button>
+          <button type="submit" class="btn btn-primary">Add user</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+</div>
+</template>
+
+<script id="app-state" type="application/json">{}</script>
+<script>
+function main(){
+  var DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  var HOURS = [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0];
+  var PALETTE = ['#3d6b96','#3fa9dc','#4a9950','#d9822b','#d4a017','#7a5ea8','#b1477a','#3d8f8a','#5a6b8f','#8a5a3d'];
+
+  var state = null;
+  var artifactApi = null;
+  var editing = null;
+  var newCategoryColor = null;
+  var categorySelectValue = '';
+  var currentUserId = null;
+
+  function userData(){
+    if (!currentUserId) return ensureUserDataShape({});
+    if (!state.data[currentUserId]) state.data[currentUserId] = ensureUserDataShape({});
+    return state.data[currentUserId];
+  }
+  function findUserById(id){
+    for (var i = 0; i < state.users.length; i++){ if (state.users[i].id === id) return state.users[i]; }
+    return null;
+  }
+  function findUserByEmail(email){
+    var e = String(email || '').trim().toLowerCase();
+    for (var i = 0; i < state.users.length; i++){ if (state.users[i].email === e) return state.users[i]; }
+    return null;
+  }
+  function isValidEmail(email){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
+  }
+  function genSalt(){
+    try{
+      var arr = new Uint8Array(16);
+      crypto.getRandomValues(arr);
+      return Array.prototype.map.call(arr, function(b){ return b.toString(16).padStart(2, '0'); }).join('');
+    }catch(e){
+      return String(Date.now()) + String(Math.random()).slice(2);
+    }
+  }
+  function hashPassword(password, salt){
+    var input = salt + ':' + password;
+    if (window.crypto && window.crypto.subtle){
+      try{
+        var data = new TextEncoder().encode(input);
+        return crypto.subtle.digest('SHA-256', data).then(function(buf){
+          return Array.prototype.map.call(new Uint8Array(buf), function(b){ return b.toString(16).padStart(2, '0'); }).join('');
+        });
+      }catch(e){}
+    }
+    var h = 5381;
+    for (var i = 0; i < input.length; i++){ h = ((h * 33) ^ input.charCodeAt(i)) >>> 0; }
+    return Promise.resolve('fb' + h.toString(16));
+  }
+  function loadSession(){
+    try{
+      var raw = localStorage.getItem('timeblock-session-v1');
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      return parsed && parsed.userId ? parsed.userId : null;
+    }catch(e){ return null; }
+  }
+  function saveSession(userId){
+    try{ localStorage.setItem('timeblock-session-v1', JSON.stringify({userId: userId})); }catch(e){}
+  }
+  function clearSession(){
+    try{ localStorage.removeItem('timeblock-session-v1'); }catch(e){}
+  }
+
+  function slotKey(h){ return (h < 10 ? '0' : '') + h + ':00'; }
+  function hourLabel(h){
+    var period = h < 12 ? 'AM' : 'PM';
+    var hr = h % 12; if (hr === 0) hr = 12;
+    return hr + ' ' + period;
+  }
+  function findCategory(name){
+    if (!name) return null;
+    for (var i = 0; i < userData().categories.length; i++){
+      if (userData().categories[i].name.toLowerCase() === name.toLowerCase()) return userData().categories[i];
+    }
+    return null;
+  }
+  function categoryColor(name){
+    var c = findCategory(name);
+    return c ? c.color : null;
+  }
+  function nextDefaultColor(){
+    var used = userData().categories.map(function(c){ return c.color; });
+    for (var i = 0; i < PALETTE.length; i++){
+      if (used.indexOf(PALETTE[i]) === -1) return PALETTE[i];
+    }
+    return PALETTE[userData().categories.length % PALETTE.length];
+  }
+  function ensureUserDataShape(d){
+    if (!d || typeof d !== 'object') d = {};
+    if (!d.schedule || typeof d.schedule !== 'object') d.schedule = {};
+    DAYS.forEach(function(day){ if (!d.schedule[day] || typeof d.schedule[day] !== 'object') d.schedule[day] = {}; });
+    if (!Array.isArray(d.todos)) d.todos = [];
+    if (!Array.isArray(d.categories)) d.categories = [];
+    if (!Array.isArray(d.bookmarkTabs)) d.bookmarkTabs = [];
+    d.bookmarkTabs = d.bookmarkTabs.filter(function(t){ return t && typeof t === 'object'; }).map(function(t){
+      return {
+        id: t.id || ('bt-' + Date.now() + '-' + Math.floor(Math.random() * 1000)),
+        heading: typeof t.heading === 'string' && t.heading.trim() ? t.heading.slice(0, 40) : 'New tab',
+        bookmarks: Array.isArray(t.bookmarks) ? t.bookmarks.filter(function(b){ return b && typeof b === 'object' && b.url; }).map(function(b){
+          return {
+            id: b.id || ('bm-' + Date.now() + '-' + Math.floor(Math.random() * 1000)),
+            url: String(b.url).slice(0, 300),
+            title: (b.title ? String(b.title) : String(b.url)).slice(0, 60)
+          };
+        }) : []
+      };
+    });
+    return d;
+  }
+  function ensureShape(s){
+    if (!s || typeof s !== 'object') s = {};
+    if (!Array.isArray(s.users)) s.users = [];
+    if (!s.data || typeof s.data !== 'object') s.data = {};
+    s.users.forEach(function(u){ s.data[u.id] = ensureUserDataShape(s.data[u.id]); });
+    var hasLegacyData = (s.schedule && Object.keys(s.schedule).some(function(day){ return Object.keys(s.schedule[day] || {}).length > 0; })) ||
+      (Array.isArray(s.todos) && s.todos.length > 0) ||
+      (Array.isArray(s.categories) && s.categories.length > 0) ||
+      (Array.isArray(s.bookmarkTabs) && s.bookmarkTabs.length > 0);
+    if (s.users.length === 0 && hasLegacyData){
+      s._migrationSeed = ensureUserDataShape({schedule: s.schedule, todos: s.todos, categories: s.categories, bookmarkTabs: s.bookmarkTabs});
+    }
+    delete s.schedule;
+    delete s.todos;
+    delete s.categories;
+    delete s.bookmarkTabs;
+    return s;
+  }
+  function loadEmbeddedState(){
+    try{
+      var el = document.getElementById('app-state');
+      return ensureShape(JSON.parse(el.textContent));
+    }catch(e){ return ensureShape({}); }
+  }
+  function loadLocalState(){
+    try{
+      var raw = localStorage.getItem('timeblock-state-v1');
+      if (raw) return ensureShape(JSON.parse(raw));
+    }catch(e){}
+    return null;
+  }
+  function saveLocal(){
+    try{ localStorage.setItem('timeblock-state-v1', JSON.stringify(state)); }catch(e){}
+  }
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function todayName(){
+    var jsDay = new Date().getDay();
+    var idx = (jsDay + 6) % 7;
+    return DAYS[idx];
+  }
+
+  function mountChrome(){
+    var tpl = document.getElementById('chrome-template');
+    document.body.insertAdjacentHTML('beforeend', tpl.innerHTML);
+  }
+
+  function renderLegend(){
+    var legend = document.getElementById('legend');
+    if (!legend) return;
+    if (userData().categories.length === 0){
+      legend.hidden = true;
+      legend.innerHTML = '';
+      return;
+    }
+    legend.hidden = false;
+    legend.innerHTML = userData().categories.map(function(c){
+      return '<li class="legend-item"><span class="dot" style="--cat-c:' + c.color + '"></span>' + escapeHtml(c.name) + '</li>';
+    }).join('');
+  }
+
+  function render(){
+    renderTable();
+    renderTodos();
+    renderLegend();
+    renderBookmarks();
+  }
+
+  function renderTable(){
+    var tbody = document.getElementById('table-body');
+    if (!tbody) return;
+    var today = todayName();
+    var nowHour = new Date().getHours();
+
+    var headRow = document.getElementById('time-header-row');
+    if (headRow){
+      var headHtml = '<th class="corner">Day / Time</th>';
+      HOURS.forEach(function(h){
+        headHtml += '<th class="time-head' + (h === nowHour ? ' is-now-col' : '') + '">' + hourLabel(h) + '</th>';
+      });
+      headRow.innerHTML = headHtml;
+    }
+
+    var html = '';
+    DAYS.forEach(function(day){
+      html += '<tr class="day-row' + (day === today ? ' is-today' : '') + '">';
+      html += '<th scope="row" class="day-cell">' + day + (day === today ? '<span class="today-badge">Today</span>' : '') + '</th>';
+      HOURS.forEach(function(h){
+        var key = slotKey(h);
+        var task = userData().schedule[day][key];
+        var isNow = (day === today && h === nowHour);
+        var cellClass = 'slot' + (isNow ? ' is-now' : '');
+        if (task){
+          var color = categoryColor(task.category);
+          var style = color ? ' style="--cat-c:' + color + '"' : '';
+          var titleAttr = task.category ? ' title="' + escapeHtml(task.category) + '"' : '';
+          html += '<td class="' + cellClass + ' filled" data-day="' + day + '" data-time="' + key + '"><button type="button" class="chip" data-day="' + day + '" data-time="' + key + '"' + style + titleAttr + '>' + escapeHtml(task.text) + '</button></td>';
+        } else {
+          html += '<td class="' + cellClass + '" data-day="' + day + '" data-time="' + key + '"><button type="button" class="slot-add" data-day="' + day + '" data-time="' + key + '" aria-label="Add task">+</button></td>';
+        }
+      });
+      html += '</tr>';
+    });
+    tbody.innerHTML = html;
+    Array.prototype.forEach.call(tbody.querySelectorAll('.chip'), function(el){
+      el.addEventListener('click', function(){ openModal(el.getAttribute('data-day'), el.getAttribute('data-time'), true); });
+    });
+    Array.prototype.forEach.call(tbody.querySelectorAll('.slot-add'), function(el){
+      el.addEventListener('click', function(){ openModal(el.getAttribute('data-day'), el.getAttribute('data-time'), false); });
+    });
+  }
+
+  function renderTodos(){
+    var list = document.getElementById('todo-list');
+    var empty = document.getElementById('todo-empty');
+    var count = document.getElementById('todo-count');
+    if (!list) return;
+    if (count) count.textContent = String(userData().todos.filter(function(t){ return !t.done; }).length);
+    if (userData().todos.length === 0){
+      list.innerHTML = '';
+      if (empty) empty.hidden = false;
+      return;
+    }
+    if (empty) empty.hidden = true;
+    var sorted = userData().todos.slice().sort(function(a, b){
+      if (a.done === b.done) return 0;
+      return a.done ? 1 : -1;
+    });
+    list.innerHTML = sorted.map(function(t){
+      return '<li class="todo-item' + (t.done ? ' done' : '') + '">' +
+        '<label class="todo-check"><input type="checkbox" ' + (t.done ? 'checked' : '') + ' data-id="' + t.id + '"><span class="todo-text">' + escapeHtml(t.text) + '</span></label>' +
+        '<button type="button" class="todo-delete" data-id="' + t.id + '" aria-label="Delete task">&times;</button></li>';
+    }).join('');
+    Array.prototype.forEach.call(list.querySelectorAll('input[type=checkbox]'), function(cb){
+      cb.addEventListener('change', function(){ toggleTodo(cb.getAttribute('data-id')); });
+    });
+    Array.prototype.forEach.call(list.querySelectorAll('.todo-delete'), function(btn){
+      btn.addEventListener('click', function(){ deleteTodo(btn.getAttribute('data-id')); });
+    });
+  }
+
+  function findTab(id){
+    for (var i = 0; i < userData().bookmarkTabs.length; i++){
+      if (userData().bookmarkTabs[i].id === id) return userData().bookmarkTabs[i];
+    }
+    return null;
+  }
+  function normalizeUrl(url){
+    return /^[a-z][a-z0-9+.-]*:\/\//i.test(url) ? url : 'https://' + url;
+  }
+  function faviconUrl(url){
+    try{
+      var u = new URL(normalizeUrl(url));
+      return 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(u.hostname) + '&sz=64';
+    }catch(e){
+      return '';
+    }
+  }
+
+  function renderBookmarks(){
+    var grid = document.getElementById('bookmarks-grid');
+    if (!grid) return;
+    if (userData().bookmarkTabs.length === 0){
+      grid.innerHTML = '<p class="empty-note">No bookmark tabs yet &mdash; add one to save links you use often.</p>';
+      return;
+    }
+    grid.innerHTML = userData().bookmarkTabs.map(function(tab){
+      var rows = tab.bookmarks.map(function(b){
+        var fav = faviconUrl(b.url);
+        var favEl = fav
+          ? '<img class="bookmark-favicon" src="' + fav + '" alt="" loading="lazy" data-fallback="1">'
+          : '<span class="bookmark-favicon bookmark-favicon-fallback"></span>';
+        return '<li class="bookmark-row">' + favEl +
+          '<a class="bookmark-title" href="' + escapeHtml(normalizeUrl(b.url)) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(b.title) + '</a>' +
+          '<button type="button" class="bookmark-delete" data-tab="' + tab.id + '" data-bm="' + b.id + '" aria-label="Delete bookmark">&times;</button></li>';
+      }).join('');
+      return '<div class="bookmark-card">' +
+        '<div class="bookmark-card-header">' +
+          '<h3 class="bookmark-heading" data-tab="' + tab.id + '" tabindex="0" role="button" aria-label="Edit tab name">' + escapeHtml(tab.heading) + '</h3>' +
+          '<button type="button" class="bookmark-tab-delete" data-tab="' + tab.id + '" aria-label="Delete tab">&times;</button>' +
+        '</div>' +
+        '<ul class="bookmark-list">' + rows + '</ul>' +
+        (tab.bookmarks.length === 0 ? '<p class="empty-note">No bookmarks yet.</p>' : '') +
+        '<button type="button" class="btn btn-secondary bookmark-add-btn" data-tab="' + tab.id + '">+ Add bookmark</button>' +
+      '</div>';
+    }).join('');
+    wireBookmarkCardEvents();
+  }
+
+  function wireBookmarkCardEvents(){
+    var grid = document.getElementById('bookmarks-grid');
+    if (!grid) return;
+    Array.prototype.forEach.call(grid.querySelectorAll('img.bookmark-favicon[data-fallback]'), function(img){
+      img.addEventListener('error', function(){
+        var span = document.createElement('span');
+        span.className = 'bookmark-favicon bookmark-favicon-fallback';
+        img.replaceWith(span);
+      });
+    });
+    Array.prototype.forEach.call(grid.querySelectorAll('.bookmark-heading'), function(h){
+      var onEdit = function(e){ e.preventDefault(); startEditHeading(h, h.getAttribute('data-tab')); };
+      h.addEventListener('click', onEdit);
+      h.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') onEdit(e); });
+    });
+    Array.prototype.forEach.call(grid.querySelectorAll('.bookmark-tab-delete'), function(btn){
+      btn.addEventListener('click', function(){ deleteTab(btn.getAttribute('data-tab')); });
+    });
+    Array.prototype.forEach.call(grid.querySelectorAll('.bookmark-delete'), function(btn){
+      btn.addEventListener('click', function(){ deleteBookmark(btn.getAttribute('data-tab'), btn.getAttribute('data-bm')); });
+    });
+    Array.prototype.forEach.call(grid.querySelectorAll('.bookmark-add-btn'), function(btn){
+      btn.addEventListener('click', function(){ openBookmarkModal(btn.getAttribute('data-tab')); });
+    });
+  }
+
+  function startEditHeading(headingEl, tabId){
+    var tab = findTab(tabId);
+    if (!tab) return;
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'bookmark-heading-input';
+    input.maxLength = 40;
+    input.value = tab.heading;
+    headingEl.replaceWith(input);
+    input.focus();
+    input.select();
+    var done = false;
+    function commit(){
+      if (done) return;
+      done = true;
+      var val = input.value.trim().slice(0, 40) || tab.heading;
+      tab.heading = val;
+      render();
+      persist();
+    }
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter'){ e.preventDefault(); input.blur(); }
+      else if (e.key === 'Escape'){ e.preventDefault(); done = true; render(); }
+    });
+  }
+
+  function addTab(){
+    var id = 'bt-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+    userData().bookmarkTabs.push({id: id, heading: 'New tab', bookmarks: []});
+    render();
+    persist();
+    var grid = document.getElementById('bookmarks-grid');
+    var newHeading = grid && grid.querySelector('.bookmark-heading[data-tab="' + id + '"]');
+    if (newHeading) startEditHeading(newHeading, id);
+  }
+  function deleteTab(id){
+    userData().bookmarkTabs = userData().bookmarkTabs.filter(function(t){ return t.id !== id; });
+    render();
+    persist();
+  }
+  function deleteBookmark(tabId, bmId){
+    var tab = findTab(tabId);
+    if (!tab) return;
+    tab.bookmarks = tab.bookmarks.filter(function(b){ return b.id !== bmId; });
+    render();
+    persist();
+  }
+
+  var bookmarkEditing = null;
+  function openBookmarkModal(tabId){
+    var tab = findTab(tabId);
+    if (!tab) return;
+    bookmarkEditing = {tabId: tabId};
+    var overlay = document.getElementById('bookmark-modal-overlay');
+    var subtitle = document.getElementById('bookmark-modal-subtitle');
+    var urlInput = document.getElementById('bookmark-url');
+    var titleInput = document.getElementById('bookmark-title');
+    subtitle.textContent = 'Add a link to "' + tab.heading + '"';
+    urlInput.value = '';
+    titleInput.value = '';
+    overlay.hidden = false;
+    setTimeout(function(){ urlInput.focus(); }, 0);
+  }
+  function closeBookmarkModal(){
+    document.getElementById('bookmark-modal-overlay').hidden = true;
+    bookmarkEditing = null;
+  }
+  function saveBookmarkFromModal(){
+    if (!bookmarkEditing) return;
+    var tab = findTab(bookmarkEditing.tabId);
+    if (!tab){ closeBookmarkModal(); return; }
+    var urlInput = document.getElementById('bookmark-url');
+    var titleInput = document.getElementById('bookmark-title');
+    var url = urlInput.value.trim();
+    if (!url){ closeBookmarkModal(); return; }
+    var title = titleInput.value.trim().slice(0, 60) || url;
+    var id = 'bm-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+    tab.bookmarks.push({id: id, url: url.slice(0, 300), title: title});
+    closeBookmarkModal();
+    render();
+    persist();
+  }
+
+  function buildSwatchRow(containerId, selectedColor, onPick){
+    var wrap = document.getElementById(containerId);
+    if (!wrap) return;
+    wrap.innerHTML = PALETTE.map(function(c){
+      return '<button type="button" class="swatch-btn' + (c === selectedColor ? ' selected' : '') + '" data-color="' + c + '" style="--cat-c:' + c + '" aria-label="Use this color"></button>';
+    }).join('');
+    Array.prototype.forEach.call(wrap.querySelectorAll('.swatch-btn'), function(btn){
+      btn.addEventListener('click', function(){
+        onPick(btn.getAttribute('data-color'));
+        Array.prototype.forEach.call(wrap.querySelectorAll('.swatch-btn'), function(b){ b.classList.toggle('selected', b === btn); });
+      });
+    });
+  }
+
+  function closeCategoryPanel(){
+    var panel = document.getElementById('category-select-panel');
+    var btn = document.getElementById('category-select-btn');
+    if (!panel) return;
+    panel.hidden = true;
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  }
+
+  function buildCategoryPanelOptions(){
+    var panel = document.getElementById('category-select-panel');
+    if (!panel) return;
+    var html = '<li class="select-option' + (categorySelectValue === '' ? ' selected' : '') + '" data-value="">' +
+      '<span class="dot"></span>No category' + (categorySelectValue === '' ? '<span class="option-check">&#10003;</span>' : '') + '</li>';
+    userData().categories.forEach(function(c){
+      var sel = categorySelectValue === c.name;
+      html += '<li class="select-option' + (sel ? ' selected' : '') + '" data-value="' + escapeHtml(c.name) + '">' +
+        '<span class="dot" style="--cat-c:' + c.color + '"></span>' + escapeHtml(c.name) + (sel ? '<span class="option-check">&#10003;</span>' : '') + '</li>';
+    });
+    html += '<li class="select-option add-new" data-value="__new__">+ Add new category&hellip;</li>';
+    panel.innerHTML = html;
+    Array.prototype.forEach.call(panel.querySelectorAll('.select-option'), function(li){
+      li.addEventListener('click', function(){
+        setCategorySelectValue(li.getAttribute('data-value'));
+        closeCategoryPanel();
+      });
+    });
+  }
+
+  function openCategoryPanel(){
+    var panel = document.getElementById('category-select-panel');
+    var btn = document.getElementById('category-select-btn');
+    if (!panel) return;
+    buildCategoryPanelOptions();
+    panel.hidden = false;
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+  }
+
+  function updateCategoryButton(){
+    var label = document.getElementById('category-select-label');
+    var dot = document.getElementById('category-select-dot');
+    if (!label || !dot) return;
+    if (categorySelectValue === ''){
+      label.textContent = 'No category';
+      dot.hidden = true;
+    } else if (categorySelectValue === '__new__'){
+      label.textContent = 'New category';
+      dot.hidden = true;
+    } else {
+      label.textContent = categorySelectValue;
+      var c = findCategory(categorySelectValue);
+      if (c){
+        dot.hidden = false;
+        dot.style.setProperty('--cat-c', c.color);
+      } else {
+        dot.hidden = true;
+      }
+    }
+  }
+
+  function setCategorySelectValue(value){
+    categorySelectValue = value;
+    updateCategoryButton();
+    var nameField = document.getElementById('new-category-name-field');
+    var colorField = document.getElementById('category-color-field');
+    var hint = document.getElementById('category-color-hint');
+    if (value === '__new__'){
+      nameField.hidden = false;
+      document.getElementById('new-category-name').value = '';
+      colorField.hidden = false;
+      hint.textContent = 'Pick a color:';
+      newCategoryColor = nextDefaultColor();
+      buildSwatchRow('category-swatches', newCategoryColor, function(c){ newCategoryColor = c; });
+      setTimeout(function(){ document.getElementById('new-category-name').focus(); }, 0);
+    } else if (value === ''){
+      nameField.hidden = true;
+      colorField.hidden = true;
+    } else {
+      nameField.hidden = true;
+      colorField.hidden = false;
+      hint.textContent = 'Color for "' + value + '":';
+      var cat = findCategory(value);
+      buildSwatchRow('category-swatches', cat ? cat.color : null, function(c){
+        var target = findCategory(value);
+        if (target){
+          target.color = c;
+          updateCategoryButton();
+          render();
+          persist();
+        }
+      });
+    }
+  }
+
+  function openModal(day, time, isEdit){
+    editing = {day: day, time: time};
+    var overlay = document.getElementById('modal-overlay');
+    var title = document.getElementById('modal-title');
+    var subtitle = document.getElementById('modal-subtitle');
+    var input = document.getElementById('task-text');
+    var deleteBtn = document.getElementById('delete-task-btn');
+    var h = parseInt(time.split(':')[0], 10);
+    subtitle.textContent = day + ' · ' + hourLabel(h);
+    var existingCategory = '';
+    if (isEdit && userData().schedule[day][time]){
+      title.textContent = 'Edit task';
+      input.value = userData().schedule[day][time].text;
+      existingCategory = userData().schedule[day][time].category || '';
+      deleteBtn.hidden = false;
+    } else {
+      title.textContent = 'Add task';
+      input.value = '';
+      deleteBtn.hidden = true;
+    }
+    closeCategoryPanel();
+    setCategorySelectValue(existingCategory);
+    overlay.hidden = false;
+    setTimeout(function(){ input.focus(); }, 0);
+  }
+  function closeModal(){
+    document.getElementById('modal-overlay').hidden = true;
+    closeCategoryPanel();
+    editing = null;
+  }
+  function saveTaskFromModal(){
+    if (!editing) return;
+    var input = document.getElementById('task-text');
+    var text = input.value.trim();
+    if (!text){ closeModal(); return; }
+    var category = '';
+    if (categorySelectValue === '__new__'){
+      var name = document.getElementById('new-category-name').value.trim().slice(0, 24);
+      if (name){
+        var existing = findCategory(name);
+        if (existing){
+          category = existing.name;
+        } else {
+          var color = newCategoryColor || nextDefaultColor();
+          userData().categories.push({name: name, color: color});
+          category = name;
+        }
+      }
+    } else if (categorySelectValue){
+      category = categorySelectValue;
+    }
+    userData().schedule[editing.day][editing.time] = {text: text.slice(0, 60), category: category};
+    closeModal();
+    render();
+    persist();
+  }
+  function deleteTaskFromModal(){
+    if (!editing) return;
+    delete userData().schedule[editing.day][editing.time];
+    closeModal();
+    render();
+    persist();
+  }
+
+  function addTodo(text){
+    var t = text.trim();
+    if (!t) return;
+    userData().todos.push({id: 'td-' + Date.now() + '-' + Math.floor(Math.random() * 1000), text: t.slice(0, 120), done: false});
+    render();
+    persist();
+  }
+  function toggleTodo(id){
+    userData().todos.forEach(function(t){ if (t.id === id) t.done = !t.done; });
+    render();
+    persist();
+  }
+  function deleteTodo(id){
+    userData().todos = userData().todos.filter(function(t){ return t.id !== id; });
+    render();
+    persist();
+  }
+
+  function showToast(msg){
+    var toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.hidden = false;
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(function(){ toast.hidden = true; }, 3200);
+  }
+  function showBanner(msg){
+    var banner = document.getElementById('banner');
+    if (!banner) return;
+    banner.textContent = msg;
+    banner.hidden = false;
+  }
+
+  function buildFullHtml(){
+    var styleEl = document.getElementById('app-styles');
+    var styleText = styleEl ? styleEl.textContent : '';
+    var tpl = document.getElementById('chrome-template');
+    var chromeHtml = tpl ? tpl.outerHTML : '';
+    var stateJson = JSON.stringify(state).replace(/</g, '\\u003c');
+    return '<!doctype html>\n' +
+      '<html lang="en">\n' +
+      '<head>\n' +
+      '<meta charset="UTF-8">\n' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
+      '<title>Timeblock</title>\n' +
+      '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">\n' +
+      '<style>\n' + styleText + '\n</style>\n' +
+      '</head>\n' +
+      '<body>\n' +
+      chromeHtml + '\n' +
+      '<script id="app-state" type="application/json">' + stateJson + '<' + '/script>\n' +
+      '<script>(' + main.toString() + ')();<' + '/script>\n' +
+      '</body>\n</html>';
+  }
+
+  function persist(){
+    if (artifactApi){
+      artifactApi.publish(buildFullHtml()).catch(function(err){
+        var code = err && err.code;
+        if (code === 'conflict'){
+          return;
+        } else if (code === 'not_writer' || code === 'not_granted'){
+          artifactApi = null;
+          saveLocal();
+          showBanner('You have read-only access here — changes are saved on this device only.');
+        } else if (code === 'not_declared' || code === 'capability_disabled' || code === 'capability_removed'){
+          artifactApi = null;
+          saveLocal();
+        } else {
+          saveLocal();
+          showToast('Could not sync right now — saved on this device.');
+        }
+      });
+    } else {
+      saveLocal();
+    }
+  }
+
+  function showFieldError(id, msg){
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg;
+    el.hidden = false;
+  }
+  function hideFieldError(id){
+    var el = document.getElementById(id);
+    if (el) el.hidden = true;
+  }
+
+  function submitSetupForm(){
+    hideFieldError('setup-error');
+    var email = document.getElementById('setup-email').value.trim();
+    var pw = document.getElementById('setup-password').value;
+    var pw2 = document.getElementById('setup-password-confirm').value;
+    if (!isValidEmail(email)){ showFieldError('setup-error', 'Enter a valid email address.'); return; }
+    if (pw.length < 6){ showFieldError('setup-error', 'Password must be at least 6 characters.'); return; }
+    if (pw !== pw2){ showFieldError('setup-error', 'Passwords do not match.'); return; }
+    var id = 'u-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+    var salt = genSalt();
+    hashPassword(pw, salt).then(function(hash){
+      state.users.push({id: id, email: email.toLowerCase(), salt: salt, hash: hash, role: 'admin', createdAt: Date.now()});
+      state.data[id] = state._migrationSeed || ensureUserDataShape({});
+      delete state._migrationSeed;
+      currentUserId = id;
+      saveSession(id);
+      updateAuthUI();
+      persist();
+    });
+  }
+
+  function submitLoginForm(){
+    hideFieldError('login-error');
+    var email = document.getElementById('login-email').value.trim();
+    var pw = document.getElementById('login-password').value;
+    var user = findUserByEmail(email);
+    if (!user){ showFieldError('login-error', 'Invalid email or password.'); return; }
+    hashPassword(pw, user.salt).then(function(hash){
+      if (hash !== user.hash){ showFieldError('login-error', 'Invalid email or password.'); return; }
+      currentUserId = user.id;
+      saveSession(user.id);
+      document.getElementById('login-password').value = '';
+      updateAuthUI();
+    });
+  }
+
+  function logout(){
+    currentUserId = null;
+    clearSession();
+    updateAuthUI();
+  }
+
+  function renderAuthScreen(){
+    var setupWrap = document.getElementById('setup-form-wrap');
+    var loginWrap = document.getElementById('login-form-wrap');
+    if (!setupWrap || !loginWrap) return;
+    if (state.users.length === 0){
+      setupWrap.hidden = false;
+      loginWrap.hidden = true;
+    } else {
+      setupWrap.hidden = true;
+      loginWrap.hidden = false;
+    }
+  }
+
+  function renderSessionBar(){
+    var userEl = document.getElementById('session-user');
+    var manageBtn = document.getElementById('manage-users-btn');
+    if (!userEl) return;
+    var user = findUserById(currentUserId);
+    if (!user) return;
+    userEl.textContent = user.email + (user.role === 'admin' ? ' · Admin' : '');
+    if (manageBtn) manageBtn.hidden = user.role !== 'admin';
+  }
+
+  function updateAuthUI(){
+    var authScreen = document.getElementById('auth-screen');
+    var appRoot = document.getElementById('app-root');
+    if (!authScreen || !appRoot) return;
+    var sessionUser = currentUserId ? findUserById(currentUserId) : null;
+    if (currentUserId && !sessionUser && state.users.length > 0){
+      currentUserId = null;
+      clearSession();
+    }
+    if (!currentUserId || !sessionUser){
+      authScreen.hidden = false;
+      appRoot.hidden = true;
+      renderAuthScreen();
+    } else {
+      authScreen.hidden = true;
+      appRoot.hidden = false;
+      render();
+      renderSessionBar();
+    }
+  }
+
+  function updateLiveClock(){
+    var el = document.getElementById('live-clock');
+    if (!el) return;
+    var now = new Date();
+    var dateStr = now.toLocaleDateString(undefined, {weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'});
+    var timeStr = now.toLocaleTimeString(undefined, {hour: 'numeric', minute: '2-digit', second: '2-digit'});
+    el.textContent = dateStr + ' · ' + timeStr;
+  }
+
+  function openAdminModal(){
+    var overlay = document.getElementById('admin-modal-overlay');
+    if (!overlay) return;
+    renderAdminUserList();
+    document.getElementById('new-user-email').value = '';
+    document.getElementById('new-user-password').value = '';
+    hideFieldError('add-user-error');
+    overlay.hidden = false;
+  }
+  function closeAdminModal(){
+    var overlay = document.getElementById('admin-modal-overlay');
+    if (overlay) overlay.hidden = true;
+  }
+  function renderAdminUserList(){
+    var list = document.getElementById('admin-user-list');
+    if (!list) return;
+    list.innerHTML = state.users.map(function(u){
+      var created = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '';
+      return '<li class="user-row">' +
+        '<div class="user-row-info"><div class="user-row-email">' + escapeHtml(u.email) + '</div>' +
+        '<div class="user-row-meta">Added ' + escapeHtml(created) + '</div></div>' +
+        '<span class="role-badge">' + (u.role === 'admin' ? 'Admin' : 'User') + '</span>' +
+        '<button type="button" class="user-row-delete" data-id="' + u.id + '" aria-label="Delete user">&times;</button></li>';
+    }).join('');
+    Array.prototype.forEach.call(list.querySelectorAll('.user-row-delete'), function(btn){
+      btn.addEventListener('click', function(){ deleteUser(btn.getAttribute('data-id')); });
+    });
+  }
+  function deleteUser(id){
+    var target = findUserById(id);
+    if (!target) return;
+    if (id === currentUserId){ showToast("You can't delete the account you're logged in as."); return; }
+    var remainingAdmins = state.users.filter(function(u){ return u.role === 'admin' && u.id !== id; });
+    if (target.role === 'admin' && remainingAdmins.length === 0){ showToast('At least one admin is required.'); return; }
+    state.users = state.users.filter(function(u){ return u.id !== id; });
+    delete state.data[id];
+    renderAdminUserList();
+    persist();
+  }
+  function submitAddUserForm(){
+    hideFieldError('add-user-error');
+    var email = document.getElementById('new-user-email').value.trim();
+    var pw = document.getElementById('new-user-password').value;
+    var roleInput = document.querySelector('input[name="new-user-role"]:checked');
+    var role = roleInput ? roleInput.value : 'user';
+    if (!isValidEmail(email)){ showFieldError('add-user-error', 'Enter a valid email address.'); return; }
+    if (findUserByEmail(email)){ showFieldError('add-user-error', 'A user with that email already exists.'); return; }
+    if (pw.length < 6){ showFieldError('add-user-error', 'Password must be at least 6 characters.'); return; }
+    var id = 'u-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+    var salt = genSalt();
+    hashPassword(pw, salt).then(function(hash){
+      state.users.push({id: id, email: email.toLowerCase(), salt: salt, hash: hash, role: role, createdAt: Date.now()});
+      state.data[id] = ensureUserDataShape({});
+      document.getElementById('new-user-email').value = '';
+      document.getElementById('new-user-password').value = '';
+      renderAdminUserList();
+      persist();
+      showToast('User created — share the email and password with them.');
+    });
+  }
+
+  function wireEvents(){
+    document.getElementById('task-form').addEventListener('submit', function(e){ e.preventDefault(); saveTaskFromModal(); });
+    document.getElementById('cancel-task-btn').addEventListener('click', closeModal);
+    document.getElementById('delete-task-btn').addEventListener('click', deleteTaskFromModal);
+    document.getElementById('category-select-btn').addEventListener('click', function(e){
+      e.stopPropagation();
+      var panel = document.getElementById('category-select-panel');
+      if (panel.hidden) openCategoryPanel(); else closeCategoryPanel();
+    });
+    document.addEventListener('click', function(e){
+      var wrap = document.getElementById('category-select-wrap');
+      if (wrap && !wrap.contains(e.target)) closeCategoryPanel();
+    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e){ if (e.target === this) closeModal(); });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape'){
+        var panel = document.getElementById('category-select-panel');
+        if (panel && !panel.hidden){ closeCategoryPanel(); return; }
+        var overlay = document.getElementById('modal-overlay');
+        if (overlay && !overlay.hidden){ closeModal(); return; }
+        var bmOverlay = document.getElementById('bookmark-modal-overlay');
+        if (bmOverlay && !bmOverlay.hidden){ closeBookmarkModal(); return; }
+        var adminOverlay = document.getElementById('admin-modal-overlay');
+        if (adminOverlay && !adminOverlay.hidden) closeAdminModal();
+      }
+    });
+    document.getElementById('todo-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      var input = document.getElementById('todo-input');
+      addTodo(input.value);
+      input.value = '';
+      input.focus();
+    });
+    document.getElementById('add-tab-btn').addEventListener('click', addTab);
+    document.getElementById('bookmark-form').addEventListener('submit', function(e){ e.preventDefault(); saveBookmarkFromModal(); });
+    document.getElementById('cancel-bookmark-btn').addEventListener('click', closeBookmarkModal);
+    document.getElementById('bookmark-modal-overlay').addEventListener('click', function(e){ if (e.target === this) closeBookmarkModal(); });
+    document.getElementById('setup-form').addEventListener('submit', function(e){ e.preventDefault(); submitSetupForm(); });
+    document.getElementById('login-form').addEventListener('submit', function(e){ e.preventDefault(); submitLoginForm(); });
+    document.getElementById('logout-btn').addEventListener('click', logout);
+    document.getElementById('manage-users-btn').addEventListener('click', openAdminModal);
+    document.getElementById('close-admin-modal-btn').addEventListener('click', closeAdminModal);
+    document.getElementById('admin-modal-overlay').addEventListener('click', function(e){ if (e.target === this) closeAdminModal(); });
+    document.getElementById('add-user-form').addEventListener('submit', function(e){ e.preventDefault(); submitAddUserForm(); });
+  }
+
+  function resolveCapability(){
+    try{
+      if (window.claude && typeof window.claude.use === 'function'){
+        window.claude.use('artifact').then(function(api){
+          artifactApi = api;
+          if (!artifactApi){
+            var local = loadLocalState();
+            if (local){ state = local; updateAuthUI(); }
+          }
+        }).catch(function(){ artifactApi = null; });
+      } else {
+        var local = loadLocalState();
+        if (local){ state = local; updateAuthUI(); }
+      }
+    }catch(e){ artifactApi = null; }
+  }
+
+  function start(){
+    state = loadEmbeddedState();
+    mountChrome();
+    currentUserId = loadSession();
+    wireEvents();
+    updateLiveClock();
+    if (!(window.claude && typeof window.claude.use === 'function')){
+      var local = loadLocalState();
+      if (local) state = local;
+    }
+    updateAuthUI();
+    resolveCapability();
+    setInterval(updateLiveClock, 1000);
+    setInterval(function(){
+      if (!currentUserId) return;
+      var overlay = document.getElementById('modal-overlay');
+      if (overlay && !overlay.hidden) return;
+      renderTable();
+    }, 60000);
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
+}
+main();
+</script>
