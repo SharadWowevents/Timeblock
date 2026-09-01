@@ -25,7 +25,7 @@ router.put('/', async (req, res) => {
     const updatedData = await UserData.findOneAndUpdate(
       { user: req.user._id },
       { $set: req.body },
-      { new: true, upsert: true }
+      { returnDocument: 'after', upsert: true }
     );
     res.json(updatedData);
   } catch (error) {
