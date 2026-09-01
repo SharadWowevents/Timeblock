@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import TaskModal from '../Modals/TaskModal';
 
@@ -8,12 +8,29 @@ export default function ScheduleGrid() {
   const { DAYS, userData } = useAppContext();
   const [editingSlot, setEditingSlot] = useState(null); 
   
+  // Reference for the scrollable container
+  const scrollContainerRef = useRef(null);
+
   // Safe fallbacks for backend data
   const schedule = userData?.schedule || {};
   const categories = userData?.categories || [];
 
   const currentHour = new Date().getHours();
   const currentDay = DAYS[(new Date().getDay() + 6) % 7]; 
+
+  // Automatically scroll to the current hour column on mount
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      // Find the index of the current hour (fallback to index 0 if not found)
+      const hourIndex = HOURS.indexOf(currentHour);
+      if (hourIndex !== -1) {
+        // Each time column has a min-width of ~68px, plus padding/borders. 
+        // We calculate an approximate pixel offset based on the hour index minus a couple columns for padding.
+        const targetScrollLeft = Math.max(0, (hourIndex - 1) * 75);
+        scrollContainerRef.current.scrollLeft = targetScrollLeft;
+      }
+    }
+  }, []);
 
   const formatHour = (h) => {
     const period = h < 12 ? 'AM' : 'PM';
@@ -25,7 +42,8 @@ export default function ScheduleGrid() {
 
   return (
     <section className="grid-panel">
-      <div className="table-scroll">
+      {/* Attach the ref to the scrollable wrapper div */}
+      <div className="table-scroll" ref={scrollContainerRef}>
         <table className="week-table">
           <thead>
             <tr>
@@ -39,7 +57,6 @@ export default function ScheduleGrid() {
           </thead>
           <tbody>
             {DAYS.map(day => {
-              // Safely get the specific day's schedule, defaulting to an empty object
               const daySchedule = schedule[day] || {};
 
               return (
@@ -49,7 +66,6 @@ export default function ScheduleGrid() {
                   </th>
                   {HOURS.map(h => {
                     const timeKey = getSlotKey(h);
-                    // Safely extract the task
                     const task = daySchedule[timeKey];
                     const isNow = day === currentDay && h === currentHour;
                     
@@ -60,7 +76,6 @@ export default function ScheduleGrid() {
                             className="chip" 
                             onClick={() => setEditingSlot({ day, time: timeKey, task })}
                             style={task.category ? { 
-                              // Safely search the categories array
                               '--cat-c': categories.find(c => c.name === task.category)?.color 
                             } : {}}
                           >
