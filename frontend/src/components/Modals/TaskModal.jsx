@@ -23,6 +23,9 @@ export default function TaskModal({ slot, onClose }) {
     if (!text.trim()) return;
 
     let finalCategory = category;
+    
+    // 1. Create an object to hold all of our data changes
+    const updates = {}; 
 
     if (category === '__new__') {
       const name = newCategoryName.trim().slice(0, 24);
@@ -31,9 +34,8 @@ export default function TaskModal({ slot, onClose }) {
         if (exists) {
           finalCategory = exists.name;
         } else {
-          updateUserData({ 
-            categories: [...categories, { name, color: newCategoryColor }] 
-          });
+          // 2. Add the new category to our updates object instead of calling updateUserData right away
+          updates.categories = [...categories, { name, color: newCategoryColor }];
           finalCategory = name;
         }
       } else {
@@ -41,7 +43,6 @@ export default function TaskModal({ slot, onClose }) {
       }
     }
 
-    // 2. Safe fallback: Ensure the schedule object and the specific day exist before mutating
     const newSchedule = { ...schedule };
     if (!newSchedule[slot.day]) {
       newSchedule[slot.day] = {};
@@ -49,7 +50,12 @@ export default function TaskModal({ slot, onClose }) {
     
     newSchedule[slot.day][slot.time] = { text: text.trim().slice(0, 60), category: finalCategory };
     
-    updateUserData({ schedule: newSchedule });
+    // 3. Add the updated schedule to our updates object
+    updates.schedule = newSchedule;
+    
+    // 4. Send ALL changes to the backend in one single, clean payload
+    updateUserData(updates);
+    
     onClose();
   };
 

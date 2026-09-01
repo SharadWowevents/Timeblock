@@ -57,6 +57,7 @@ export const AppProvider = ({ children }) => {
     // 1. Optimistic UI update (instantly updates screen)
     const updated = { ...userData, ...newData };
     setUserData(updated);
+    console.log('Updated userData:', updated); // Debugging line
 
     // 2. Sync to backend
     try {
