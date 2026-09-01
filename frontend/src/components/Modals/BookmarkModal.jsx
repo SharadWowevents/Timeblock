@@ -1,30 +1,44 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../../context/AppContext';
 
-export default function BookmarkModal({ tabId, onClose }) {
+// Accept an optional 'bookmark' prop
+export default function BookmarkModal({ tabId, bookmark, onClose }) {
   const { userData, updateUserData } = useAppContext();
-  const [url, setUrl] = useState('');
-  const [title, setTitle] = useState('');
   
-  // 1. Safe fallback: default to empty array if backend bookmarkTabs is missing
+  // Initialize state with existing bookmark data if we are editing
+  const [url, setUrl] = useState(bookmark ? bookmark.url : '');
+  const [title, setTitle] = useState(bookmark ? bookmark.title : '');
+  
   const bookmarkTabs = userData?.bookmarkTabs || [];
   const tab = bookmarkTabs.find(t => t.id === tabId);
 
   const handleSave = (e) => {
     e.preventDefault();
     if (!url.trim()) return;
-    
-    const newBookmark = {
-      id: `bm-${Date.now()}`,
-      url: url.trim().slice(0, 300),
-      title: title.trim().slice(0, 60) || url.trim()
-    };
 
     const updatedTabs = bookmarkTabs.map(t => {
       if (t.id === tabId) {
-        // 2. Safe fallback: ensure t.bookmarks is an array before spreading it
         const currentBookmarks = t.bookmarks || [];
-        return { ...t, bookmarks: [...currentBookmarks, newBookmark] };
+        let newBookmarksArray;
+
+        if (bookmark) {
+          // EDIT MODE: Map over bookmarks, find the matching ID, and update it
+          newBookmarksArray = currentBookmarks.map(b => 
+            b.id === bookmark.id 
+              ? { ...b, url: url.trim().slice(0, 300), title: title.trim().slice(0, 60) || url.trim() }
+              : b
+          );
+        } else {
+          // ADD MODE: Create a new bookmark object and append it
+          const newBookmark = {
+            id: `bm-${Date.now()}`,
+            url: url.trim().slice(0, 300),
+            title: title.trim().slice(0, 60) || url.trim()
+          };
+          newBookmarksArray = [...currentBookmarks, newBookmark];
+        }
+
+        return { ...t, bookmarks: newBookmarksArray };
       }
       return t;
     });
@@ -36,9 +50,11 @@ export default function BookmarkModal({ tabId, onClose }) {
   return (
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal">
-        <h2>Add bookmark</h2>
-        {/* Added a fallback heading just in case tab data hasn't loaded */}
-        <p className="modal-subtitle">Add a link to "{tab?.heading || 'Tab'}"</p>
+        {/* Dynamically change headings based on mode */}
+        <h2>{bookmark ? 'Edit bookmark' : 'Add bookmark'}</h2>
+        <p className="modal-subtitle">
+          {bookmark ? 'Update link in' : 'Add a link to'} "{tab?.heading || 'Tab'}"
+        </p>
         <form onSubmit={handleSave}>
           <label className="field-label">URL</label>
           <input type="text" autoFocus value={url} onChange={e => setUrl(e.target.value)} placeholder="e.g. wowevents.in" />

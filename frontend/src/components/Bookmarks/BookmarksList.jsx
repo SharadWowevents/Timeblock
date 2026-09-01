@@ -7,6 +7,7 @@ export default function BookmarksList() {
   const [editingTabId, setEditingTabId] = useState(null);
   const [editHeadingVal, setEditHeadingVal] = useState('');
   const [activeModalTab, setActiveModalTab] = useState(null);
+  const [editingBookmark, setEditingBookmark] = useState(null); // Add this line
 
   // Fallback to empty array to prevent crashes if DB returns undefined
   const bookmarkTabs = userData?.bookmarkTabs || [];
@@ -92,28 +93,35 @@ export default function BookmarksList() {
                 )}
                 <button className="bookmark-tab-delete" onClick={() => deleteTab(tab.id)}>×</button>
               </div>
-              
+
               <ul className="bookmark-list">
                 {(tab.bookmarks || []).map(b => (
                   <li key={b.id} className="bookmark-row">
-                    <img 
-                      className="bookmark-favicon" 
-                      src={getFavicon(b.url)} 
-                      alt="" 
+                    <img
+                      className="bookmark-favicon"
+                      src={getFavicon(b.url)}
+                      alt=""
                       onError={(e) => {
                         e.target.style.display = 'none';
                         e.target.nextSibling.style.display = 'block';
-                      }} 
+                      }}
                     />
-                    <span className="bookmark-favicon bookmark-favicon-fallback" style={{display: 'none'}}></span>
+                    <span className="bookmark-favicon bookmark-favicon-fallback" style={{ display: 'none' }}></span>
                     <a className="bookmark-title" href={b.url.startsWith('http') ? b.url : `https://${b.url}`} target="_blank" rel="noopener noreferrer">
                       {b.title}
                     </a>
+                    <button
+                      className="bookmark-delete"
+                      onClick={() => { setActiveModalTab(tab.id); setEditingBookmark(b); }}
+                      style={{ fontSize: '13px', marginRight: '4px' }}
+                    >
+                      ✎
+                    </button>
                     <button className="bookmark-delete" onClick={() => deleteBookmark(tab.id, b.id)}>×</button>
                   </li>
                 ))}
               </ul>
-              
+
               <button className="btn btn-secondary bookmark-add-btn" onClick={() => setActiveModalTab(tab.id)}>+ Add bookmark</button>
             </div>
           ))
@@ -121,7 +129,14 @@ export default function BookmarksList() {
       </div>
 
       {activeModalTab && (
-        <BookmarkModal tabId={activeModalTab} onClose={() => setActiveModalTab(null)} />
+        <BookmarkModal
+          tabId={activeModalTab}
+          bookmark={editingBookmark}
+          onClose={() => {
+            setActiveModalTab(null);
+            setEditingBookmark(null);
+          }}
+        />
       )}
     </section>
   );
