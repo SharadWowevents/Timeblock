@@ -1,10 +1,10 @@
 const express = require('express');
 const UserData = require('../models/UserData');
-const { protect } = require('../middleware/auth');
+const { protect, requirePrivacyPolicy } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.use(protect); // All routes require authentication
+router.use(protect, requirePrivacyPolicy); // All routes require authentication and consent
 
 // @route   GET /api/data
 // @desc    Get current user's data

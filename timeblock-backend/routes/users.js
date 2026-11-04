@@ -2,11 +2,11 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const UserData = require('../models/UserData');
-const { protect, admin } = require('../middleware/auth');
+const { protect, admin, requirePrivacyPolicy } = require('../middleware/auth');
 
 const router = express.Router();
 // All routes here require valid token AND admin role
-router.use(protect, admin);
+router.use(protect, requirePrivacyPolicy, admin);
 
 // @route   GET /api/users
 // @desc    Get all users

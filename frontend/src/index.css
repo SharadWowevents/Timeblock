@@ -575,6 +575,25 @@ input[type="text"]:focus-visible, input[type="email"]:focus-visible, input[type=
   color:var(--ink-muted);
   margin:0 0 18px;
 }
+.privacy-modal{ max-width:460px; }
+.privacy-policy{
+  color:var(--ink-muted);
+  font-size:13px;
+  line-height:1.55;
+}
+.privacy-policy p{ margin:0 0 14px; }
+.privacy-policy-checkbox{
+  display:flex;
+  align-items:flex-start;
+  gap:9px;
+  color:var(--ink);
+  cursor:pointer;
+}
+.privacy-policy-checkbox input{
+  margin:3px 0 0;
+  accent-color:var(--accent);
+}
+.privacy-policy-checkbox span{ flex:1; }
 .field-label{
   font-size:12px;
   font-weight:600;

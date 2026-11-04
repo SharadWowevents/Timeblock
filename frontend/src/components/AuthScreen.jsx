@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
+import PrivacyPolicyAgreement from './PrivacyPolicyAgreement';
 
 export default function AuthScreen() {
   const { API_URL, handleAuthResponse } = useAppContext();
@@ -7,6 +8,7 @@ export default function AuthScreen() {
   const [isSetupMode, setIsSetupMode] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [privacyPolicyAccepted, setPrivacyPolicyAccepted] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
@@ -19,7 +21,11 @@ export default function AuthScreen() {
       const res = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({
+          email,
+          password,
+          ...(isSetupMode && { privacyPolicyAccepted })
+        })
       });
 
       const data = await res.json();
@@ -29,7 +35,7 @@ export default function AuthScreen() {
       }
 
       handleAuthResponse(data);
-    } catch (err) {
+    } catch {
       setError('Network error. Is the backend running?');
     }
   };
@@ -48,6 +54,14 @@ export default function AuthScreen() {
           
           <label className="field-label">Password</label>
           <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
+
+          {isSetupMode && (
+            <PrivacyPolicyAgreement
+              checked={privacyPolicyAccepted}
+              onChange={e => setPrivacyPolicyAccepted(e.target.checked)}
+              required
+            />
+          )}
 
           {error && <p className="field-error">{error}</p>}
           

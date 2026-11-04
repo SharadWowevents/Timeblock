@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useState, useEffect, useContext } from 'react';
 
 const AppContext = createContext(null);
 
@@ -75,9 +75,35 @@ export const AppProvider = ({ children }) => {
   };
 
   const handleAuthResponse = (data) => {
-    const user = { _id: data._id, email: data.email, role: data.role };
+    const user = {
+      _id: data._id,
+      email: data.email,
+      role: data.role,
+      privacyPolicyAcceptedAt: data.privacyPolicyAcceptedAt
+    };
     setCurrentUser(user);
     setToken(data.token);
+  };
+
+  const acceptPrivacyPolicy = async () => {
+    const res = await fetch(`${API_URL}/auth/privacy-policy/accept`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ accepted: true })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Could not save Privacy Policy acceptance.');
+    }
+
+    const user = { ...currentUser, privacyPolicyAcceptedAt: data.privacyPolicyAcceptedAt };
+    await fetchUserData();
+    setCurrentUser(user);
+    localStorage.setItem('timeblock-user', JSON.stringify(user));
   };
 
   const logout = () => {
@@ -86,7 +112,7 @@ export const AppProvider = ({ children }) => {
 
   const contextValue = {
     API_URL, token, currentUser, userData, updateUserData,
-    DAYS, PALETTE, handleAuthResponse, logout
+    DAYS, PALETTE, handleAuthResponse, acceptPrivacyPolicy, logout
   };
 
   if (!isLoaded) return null; // Or a loading spinner

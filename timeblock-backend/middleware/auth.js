@@ -29,4 +29,12 @@ const admin = (req, res, next) => {
   }
 };
 
-module.exports = { protect, admin };
+const requirePrivacyPolicy = (req, res, next) => {
+  if (req.user && req.user.privacyPolicyAcceptedAt) {
+    next();
+  } else {
+    res.status(403).json({ error: 'Privacy Policy acceptance required', code: 'PRIVACY_POLICY_REQUIRED' });
+  }
+};
+
+module.exports = { protect, admin, requirePrivacyPolicy };
